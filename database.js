@@ -3,8 +3,8 @@ const client = new Client({
     host: "localhost",
     user: "postgres",
     port: "5432",
-    password: "Wilgot2005",
-    database: "postgres"
+    password: process.env.DATABASE_PASSWORD,
+    database: "blogsitedatabase"
 })
 
 module.exports = client;
