@@ -2,6 +2,7 @@ const client = require("../database");
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const uuid = require("uuid");
 
 router.post("/register", async (req, res) => {
     const newUser = {
@@ -17,7 +18,7 @@ router.post("/register", async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(newUser.password, salt);
 
-        const rows = await client.query(`insert into users(name, email, password) values ('${newUser.name}', '${newUser.email}','${hashPassword}')`);
+        const rows = await client.query(`insert into users(name, email, password, id) values ('${newUser.name}', '${newUser.email}','${hashPassword}', '${uuid.v4()}')`);
         console.log(rows)
         res.send(newUser);
     }else{
@@ -37,10 +38,10 @@ router.post("/login", async (req, res) =>{
     if(data.rowCount === 0) {
         res.status(400).send("couldn't find user");   
     }else{
-        const validPassword = await bcrypt.compare(user.password, data.password);
+        const validPassword = await bcrypt.compare(user.password, data.rows[0].password);
         if(!validPassword) return res.status(400).send("Invalid password");
         
-        const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
+        const token = jwt.sign({_id: data.rows[0].id}, process.env.TOKEN_SECRET);
         res.json(token);
     }
 
