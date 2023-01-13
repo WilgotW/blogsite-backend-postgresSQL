@@ -23,14 +23,15 @@ router.post("/post", verify, async (req, res) => {
     const blog = {
         title: req.body.title,
         content: req.body.content,
-        userId: decoded._id
+        userId: decoded._id,
+        likes: 0
     }
 
     if(!blog.title || !blog.content || !blog.userId){
         return res.status(400).send("invalid input");
     }
 
-    const data = await client.query(`insert into blogs(title, content, userId, blog_id) values ('${blog.title}', '${blog.content}', '${blog.userId}', '${uuid.v4()}')`);
+    const data = await client.query(`insert into blogs(title, content, userId, blog_id, likes) values ('${blog.title}', '${blog.content}', '${blog.userId}', '${uuid.v4()}', ${blog.likes})`);
     res.send(data.rows);
 })
 
@@ -44,6 +45,16 @@ router.delete("/delete/:blogId", verify, async (req, res) => {
     res.send("deleted blog");
 })
 
+router.like("/like/:blogId", verify, async (req, res) => {
+    if(!req.params.blogId){
+        return res.status(400).send("invalid blog id");
+    }
+
+    const data = await client.query(`select * from blogs where blog_id = '${req.params.blogId}'`);
+    const blogLikes = data.rows[0].likes;
+
+    
+})
 
 
 module.exports = router;
