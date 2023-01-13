@@ -3,9 +3,10 @@ const app = express();
 const PORT = 3000;
 const cors = require("cors");
 const dotenv = require("dotenv");
+dotenv.config();
+
 const client = require("./database");
 
-dotenv.config();
 
 //routes
 // const blogRoute = require("./routes/blogRoutes");
