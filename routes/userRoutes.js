@@ -18,7 +18,7 @@ router.post("/register", async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(newUser.password, salt);
 
-        const rows = await client.query(`insert into users(name, email, password, id) values ('${newUser.name}', '${newUser.email}','${hashPassword}', '${uuid.v4()}')`);
+        const rows = await client.query(`insert into users(name, email, password, userid) values ('${newUser.name}', '${newUser.email}','${hashPassword}', '${uuid.v4()}')`);
         console.log(rows)
         res.send(newUser);
     }else{
@@ -41,7 +41,7 @@ router.post("/login", async (req, res) =>{
         const validPassword = await bcrypt.compare(user.password, data.rows[0].password);
         if(!validPassword) return res.status(400).send("Invalid password");
         
-        const token = jwt.sign({_id: data.rows[0].id}, process.env.TOKEN_SECRET);
+        const token = jwt.sign({_id: data.rows[0].userid}, process.env.TOKEN_SECRET);
         res.json(token);
     }
 
