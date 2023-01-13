@@ -3,6 +3,8 @@ const app = express();
 const PORT = 3000;
 const cors = require("cors");
 const dotenv = require("dotenv");
+const jwt = require("jsonwebtoken");
+
 dotenv.config();
 
 const client = require("./database");
