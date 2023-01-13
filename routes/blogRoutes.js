@@ -30,16 +30,18 @@ router.post("/post", verify, async (req, res) => {
         return res.status(400).send("invalid input");
     }
 
-    const data = await client.query(`insert into blogs(title, content, userId) values ('${blog.title}', '${blog.content}', '${blog.userId}', ${uuid.v4()})`);
-    res.send("created blog");
+    const data = await client.query(`insert into blogs(title, content, userId, blog_id) values ('${blog.title}', '${blog.content}', '${blog.userId}', '${uuid.v4()}')`);
+    res.send(data.rows);
 })
 
-router.delete("/delete/:blogId", verify, (req, res) => {
-    const blogId = req.params.blogId;
-
-    if(!blog.params.blogId){
+router.delete("/delete/:blogId", verify, async (req, res) => {
+    if(!req.params.blogId){
         return res.status(400).send("invalid blog id");
     }
+
+    const data = await client.query(`delete from blogs where blog_id = '${req.params.blogId}'`)
+
+    res.send("deleted blog");
 })
 
 
