@@ -4,6 +4,18 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 
+router.get("/get-user-info", async (req, res) => {
+    const decoded = jwt.verify(req.headers.token, process.env.TOKEN_SECRET);
+    const userId = decoded._id;
+    
+    if(!userId){
+        return res.status(400).send("couldn't find user");
+    }
+
+    const data = await client.query(`select * from users where userid = '${userId}'`);
+    res.send(data.rows[0]);
+});
+
 router.post("/register", async (req, res) => {
     const newUser = {
         name: req.body.name,

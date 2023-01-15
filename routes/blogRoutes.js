@@ -16,22 +16,34 @@ router.get("/my-posts", verify, async (req, res) => {
     res.send(data.rows);
 })
 
+router.get("/get-popular/:amount", verify, async (req, res) => {
+
+    const data = await client.query(`select * from blog order by likes limit ${req.params.amount}`);
+    res.send(data.rows);
+})
 
 router.post("/post", verify, async (req, res) => {
     const decoded = jwt.verify(req.headers.token, process.env.TOKEN_SECRET); 
-     
+    
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth()+1; // returns the month (0-11), Jan is 0, Feb is 1, etc
+    const day = currentDate.getDate();
+    
     const blog = {
         title: req.body.title,
         content: req.body.content,
         userId: decoded._id,
-        likes: 0
+        likes: 0,
+        post_date: `${year}-${month}-${day}`
     }
+
 
     if(!blog.title || !blog.content || !blog.userId){
         return res.status(400).send("invalid input");
     }
 
-    const data = await client.query(`insert into blog(title, content, userId, blog_id, likes) values ('${blog.title}', '${blog.content}', '${blog.userId}', '${uuid.v4()}', ${blog.likes})`);
+    const data = await client.query(`insert into blog(title, content, userId, blog_id, likes, post_date) values ('${blog.title}', '${blog.content}', '${blog.userId}', '${uuid.v4()}', ${blog.likes}, '${blog.post_date}')`);
     res.send(data.rows);
 })
 
