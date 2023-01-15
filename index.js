@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
+const PORT = process.env.PORT || 4000;
 
 dotenv.config();
 
@@ -25,4 +26,4 @@ async function init(){
 }
 init();
 
-app.listen(`0.0.0.0:$PORT`, () => console.log(`app running on port ${PORT}`));
+app.listen(PORT, () => console.log(`app running on port ${PORT}`));
