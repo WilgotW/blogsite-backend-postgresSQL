@@ -18,7 +18,12 @@ router.get("/my-posts", verify, async (req, res) => {
 
 router.get("/get-popular/:amount", verify, async (req, res) => {
 
-    const data = await client.query(`select * from blog order by likes limit ${req.params.amount}`);
+    const data = await client.query(`select * from blog order by likes desc limit ${req.params.amount}`);
+    res.send(data.rows);
+})
+router.get("/get-newest/:amount", verify, async (req, res) => {
+
+    const data = await client.query(`select * from blog order by post_date desc limit ${req.params.amount}`);
     res.send(data.rows);
 })
 
@@ -47,6 +52,11 @@ router.post("/post", verify, async (req, res) => {
     res.send(data.rows);
 })
 
+router.get("/search/:searchterm", verify, async (req, res) => {
+    const data = await client.query(`select * from blog where title like '%${req.params.searchterm}%' order by likes desc limit 9 `);
+    res.send(data.rows);
+})
+
 router.delete("/delete/:blogId", verify, async (req, res) => {
     if(!req.params.blogId){
         return res.status(400).send("invalid blog id");
@@ -62,10 +72,12 @@ router.put("/like/:blogId", verify, async (req, res) => {
         return res.status(400).send("invalid blog id");
     }
 
+    const changeValue = req.body.changeValue;
+
     const data = await client.query(`select * from blog where blog_id = '${req.params.blogId}'`);
     const blogLikes = parseInt(data.rows[0].likes);
 
-    const update = await client.query(`update blog set likes = '${blogLikes + 1}' where blog_id = '${req.params.blogId}'`)
+    const update = await client.query(`update blog set likes = '${blogLikes + changeValue}' where blog_id = '${req.params.blogId}'`)
     
     res.send("liked post");
 })
