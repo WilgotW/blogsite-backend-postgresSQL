@@ -17,24 +17,29 @@ router.get("/get-user-info", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-    const newUser = {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
-    }
+    try{
 
-    //check if email exists
-    const data = await client.query(`select * from users where email = '${newUser.email}'`);
-    if(data.rowCount === 0){
-
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(newUser.password, salt);
-
-        const rows = await client.query(`insert into users(name, email, password, userid) values ('${newUser.name}', '${newUser.email}','${hashPassword}', '${uuid.v4()}')`);
-        console.log(rows)
-        res.send(newUser);
-    }else{
-        res.status(400).send("email already exists");
+        const newUser = {
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password
+        }
+    
+        //check if email exists
+        const data = await client.query(`select * from users where email = '${newUser.email}'`);
+        if(data.rowCount === 0){
+    
+            const salt = await bcrypt.genSalt(10);
+            const hashPassword = await bcrypt.hash(newUser.password, salt);
+    
+            const rows = await client.query(`insert into users(name, email, password, userid) values ('${newUser.name}', '${newUser.email}','${hashPassword}', '${uuid.v4()}')`);
+            console.log(rows)
+            res.send(newUser);
+        }else{
+            res.status(400).send("email already exists");
+        }
+    }catch(err){
+        res.send("eroorrrr");
     }
 })
 
